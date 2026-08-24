@@ -1,0 +1,281 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+requiredVersions:
+    extensions:
+        azure.ai.agents: '>=1.0.0-beta.11'
+        azure.ai.projects: '>=1.0.0-beta.6'
+        azure.ai.connections: '>=1.0.0-beta.4'
+        azure.ai.toolboxes: '>=1.0.0-beta.5'
+        azure.ai.routines: '>=1.0.0-beta.4'
+name: chief-of-staff
+services:
+    ai-project:
+        host: azure.ai.project
+        deployments:
+            - name: gpt-5
+              model:
+                  name: gpt-5
+                  format: OpenAI
+                  version: "2025-08-07"
+              sku:
+                  name: GlobalStandard
+                  capacity: 10
+    workiq-mail:
+        host: azure.ai.connection
+        uses:
+            - ai-project
+        category: RemoteTool
+        authType: UserEntraToken
+        audience: ea9ffc3e-8a23-4a7d-836d-234d7c7565c1
+        target: https://agent365.svc.cloud.microsoft/agents/servers/mcp_MailTools
+        metadata:
+            type: catalog_MCP
+            toolEntityId: azureml://location/eastus/apiCenter/registry-prod-bl/type/tools/objectId/microsoft-outlook-mail-mcp-frontier/version/1
+    workiq-calendar:
+        host: azure.ai.connection
+        uses:
+            - ai-project
+        category: RemoteTool
+        authType: UserEntraToken
+        audience: ea9ffc3e-8a23-4a7d-836d-234d7c7565c1
+        target: https://agent365.svc.cloud.microsoft/agents/servers/mcp_CalendarTools
+        metadata:
+            type: catalog_MCP
+            toolEntityId: azureml://location/eastus/apiCenter/registry-prod-bl/type/tools/objectId/microsoft-outlook-calendar-mcp-frontier/version/1
+    workiq-teams:
+        host: azure.ai.connection
+        uses:
+            - ai-project
+        category: RemoteTool
+        authType: UserEntraToken
+        audience: ea9ffc3e-8a23-4a7d-836d-234d7c7565c1
+        target: https://agent365.svc.cloud.microsoft/agents/servers/mcp_TeamsServer
+        metadata:
+            type: catalog_MCP
+            toolEntityId: azureml://location/eastus/apiCenter/registry-prod-bl/type/tools/objectId/microsoft-teams-mcp-frontier/version/1
+    workiq-sharepoint:
+        host: azure.ai.connection
+        uses:
+            - ai-project
+        category: RemoteTool
+        authType: UserEntraToken
+        audience: ea9ffc3e-8a23-4a7d-836d-234d7c7565c1
+        target: https://agent365.svc.cloud.microsoft/agents/servers/mcp_SharePointRemoteServer
+        metadata:
+            type: catalog_MCP
+            toolEntityId: azureml://location/eastus/apiCenter/registry-prod-bl/type/tools/objectId/microsoft-sharepoint-mcp-frontier/version/1
+    workiq-onedrive:
+        host: azure.ai.connection
+        uses:
+            - ai-project
+        category: RemoteTool
+        authType: UserEntraToken
+        audience: ea9ffc3e-8a23-4a7d-836d-234d7c7565c1
+        target: https://agent365.svc.cloud.microsoft/agents/servers/mcp_OneDriveRemoteServer
+        metadata:
+            type: catalog_MCP
+            toolEntityId: azureml://location/eastus/apiCenter/registry-prod-bl/type/tools/objectId/microsoft-onedrive-mcp-frontier/version/1
+    workiq-tools:
+        host: azure.ai.toolbox
+        uses:
+            - ai-project
+            - workiq-mail
+            - workiq-calendar
+            - workiq-teams
+            - workiq-sharepoint
+            - workiq-onedrive
+        description: |
+            Foundry catalog-backed Work IQ access to Mail, Calendar, Teams, SharePoint, and OneDrive.
+            The toolbox exposes explicit read tools plus narrowly allowlisted draft, idempotent
+            calendar creation, and ETag-guarded existing-item updates. Send, reply, post, share,
+            cancel, and delete operations are not exposed.
+        tools:
+            - type: mcp
+              connection: workiq-mail
+              server_label: mail-read
+              server_url: https://agent365.svc.cloud.microsoft/agents/servers/mcp_MailTools
+              allowed_tools:
+                  tool_names:
+                      - DownloadAttachment
+                      - GetAttachments
+                      - GetMessage
+                      - SearchMessages
+                      - SearchMessagesQueryParameters
+              require_approval: never
+            - type: mcp
+              connection: workiq-mail
+              server_label: mail-write
+              server_url: https://agent365.svc.cloud.microsoft/agents/servers/mcp_MailTools
+              allowed_tools:
+                  tool_names:
+                      - CreateDraftMessage
+              require_approval: never
+            - type: mcp
+              connection: workiq-calendar
+              server_label: calendar-read
+              server_url: https://agent365.svc.cloud.microsoft/agents/servers/mcp_CalendarTools
+              allowed_tools:
+                  tool_names:
+                      - FindMeetingTimes
+                      - GetOnlineMeetingAiInsights
+                      - GetOnlineMeetingAttendanceReports
+                      - GetOnlineMeetingTranscripts
+                      - GetRooms
+                      - GetUserDateAndTimeZoneSettings
+                      - ListCalendarView
+                      - ListEvents
+              require_approval: never
+            - type: mcp
+              connection: workiq-calendar
+              server_label: calendar-write
+              server_url: https://agent365.svc.cloud.microsoft/agents/servers/mcp_CalendarTools
+              allowed_tools:
+                  tool_names:
+                      - CreateEvent
+              require_approval: never
+            - type: mcp
+              connection: workiq-teams
+              server_label: teams-read
+              server_url: https://agent365.svc.cloud.microsoft/agents/servers/mcp_TeamsServer
+              allowed_tools:
+                  tool_names:
+                      - GetChatMessage
+                      - ListChannelMessageReplies
+                      - ListChannelMessages
+                      - ListChannels
+                      - ListChatMessages
+                      - ListChats
+                      - ListTeams
+                      - SearchTeamMessagesQueryParameters
+                      - SearchTeamsMessages
+              require_approval: never
+            - type: mcp
+              connection: workiq-sharepoint
+              server_label: sharepoint-read
+              server_url: https://agent365.svc.cloud.microsoft/agents/servers/mcp_SharePointRemoteServer
+              allowed_tools:
+                  tool_names:
+                      - findFileOrFolder
+                      - findSite
+                      - getDefaultDocumentLibraryInSite
+                      - getFileOrFolderMetadata
+                      - getFileOrFolderMetadataByUrl
+                      - listDocumentLibrariesInSite
+                      - readSmallBinaryFile
+                      - readSmallTextFile
+              require_approval: never
+            - type: mcp
+              connection: workiq-sharepoint
+              server_label: sharepoint-write
+              server_url: https://agent365.svc.cloud.microsoft/agents/servers/mcp_SharePointRemoteServer
+              allowed_tools:
+                  tool_names:
+                      - renameFileOrFolder
+                      - updateListItem
+              require_approval: never
+            - type: mcp
+              connection: workiq-onedrive
+              server_label: onedrive-read
+              server_url: https://agent365.svc.cloud.microsoft/agents/servers/mcp_OneDriveRemoteServer
+              allowed_tools:
+                  tool_names:
+                      - findFileOrFolderInMyDrive
+                      - getFileOrFolderMetadataByUrl
+                      - getFileOrFolderMetadataInMyOnedrive
+                      - getOnedrive
+                      - readSmallBinaryFileFromMyOnedrive
+                      - readSmallTextFileFromMyOnedrive
+              require_approval: never
+            - type: mcp
+              connection: workiq-onedrive
+              server_label: onedrive-write
+              server_url: https://agent365.svc.cloud.microsoft/agents/servers/mcp_OneDriveRemoteServer
+              allowed_tools:
+                  tool_names:
+                      - renameFileOrFolderInMyOnedrive
+              require_approval: never
+    chief-of-staff:
+        project: src/github-copilot-activity
+        host: azure.ai.agent
+        language: python
+        uses:
+            - ai-project
+            - workiq-tools
+            - workiq-mail
+            - workiq-calendar
+            - workiq-teams
+            - workiq-sharepoint
+            - workiq-onedrive
+        agentEndpoint:
+            authorizationSchemes:
+                - type: BotServiceRbac
+            protocols:
+                - activity
+        codeConfiguration:
+            dependencyResolution: remote_build
+            entryPoint: main.py
+            runtime: python_3_13
+        container:
+            resources:
+                cpu: "1"
+                memory: 2Gi
+        description: |
+            Personal Chief of Staff for Teams using the GitHub Copilot SDK and gpt-5. Reads Mail,
+            Calendar, Teams, SharePoint, and OneDrive through Work IQ; permits only drafts,
+            idempotent calendar creation, and ETag-guarded renames or list updates. Supports
+            streaming, resilient deferred work, proactive notifications, cards, and files.
+        displayName: Chief of Staff
+        environmentVariables:
+            - name: AZURE_AI_MODEL_DEPLOYMENT_NAME
+              value: ${AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-5}
+            - name: AZURE_OPENAI_ENDPOINT
+              value: ${AZURE_OPENAI_ENDPOINT}
+            - name: TOOLBOX_ENDPOINT
+              value: ${TOOLBOX_WORKIQ_TOOLS_MCP_ENDPOINT}
+            - name: COPILOT_ENABLE_CODE_TOOLS
+              value: ${COPILOT_ENABLE_CODE_TOOLS=false}
+        activity:
+            useCase: simple
+            publish:
+                publishScope: shared
+                appVersion: "1.0.0"
+                agentDisplayName: Chief of Staff
+                developerName: John Miller
+                developerWebsiteUrl: https://github.com/therealjohn/chief-of-staff
+                privacyUrl: https://github.com/therealjohn/chief-of-staff/blob/main/README.md
+                termsOfUseUrl: https://github.com/therealjohn/chief-of-staff/blob/main/README.md
+        kind: hosted
+        metadata:
+            tags:
+                - AI Agent Hosting
+                - Activity Protocol
+                - Bring Your Own
+                - GitHub Copilot SDK
+                - Work IQ
+                - Python
+        name: chief-of-staff
+        protocols:
+            - protocol: activity
+              version: 2.0.0
+            - protocol: invocations
+              version: 1.0.0
+    weekday-chief-of-staff:
+        host: azure.ai.routine
+        enabled: false
+        uses:
+            - chief-of-staff
+        description: |
+            Weekday 8am prompt asking whether to prepare the daily briefing. Disabled by default;
+            enable it once you're ready to receive scheduled notifications.
+        triggers:
+            default:
+                type: schedule
+                cron_expression: "0 8 * * 1-5"
+                time_zone: America/New_York
+        action:
+            type: invoke_agent_invocations_api
+            agent_name: chief-of-staff
+            input:
+                notification: "Good morning! Reply here if you'd like me to prepare your daily briefing."
+infra:
+    provider: microsoft.foundry

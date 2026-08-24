@@ -1,0 +1,11 @@
+.azure
+.playwright-mcp/
+.env
+.pytest_cache/
+.ruff_cache/
+.venv/
+__pycache__/
+*.py[cod]
+appPackage.zip
+.appPackage.zip.azd-generated
+TEAMS_APP_SETUP.md

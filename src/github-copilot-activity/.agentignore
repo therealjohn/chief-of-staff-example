@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+tests/
+requirements-dev.txt
+Dockerfile
+.dockerignore
+appPackage.zip
+.appPackage.zip.azd-generated
+TEAMS_APP_SETUP.md
