@@ -34,15 +34,10 @@ Install [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) and
 ### 2. Deploy a new Foundry project
 
 From a PowerShell prompt in the repository root, install the required azd
-extensions, sign in, and deploy:
+extension, sign in, and deploy:
 
 ```powershell
-azd extension install azure.ai.agents
-azd extension install azure.ai.projects
-azd extension install azure.ai.connections
-azd extension install azure.ai.toolboxes
-azd extension install azure.ai.routines
-azd extension install microsoft.foundry
+azd ext install microsoft.foundry
 
 az login
 azd auth login
@@ -202,15 +197,10 @@ the agent locally.
 - [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd)
   1.31.2 or later.
 
-Install the required azd extensions:
+Install the required azd extension:
 
 ```powershell
-azd extension install azure.ai.agents
-azd extension install azure.ai.projects
-azd extension install azure.ai.connections
-azd extension install azure.ai.toolboxes
-azd extension install azure.ai.routines
-azd extension install microsoft.foundry
+azd ext install microsoft.foundry
 ```
 
 Sign in yourself:
