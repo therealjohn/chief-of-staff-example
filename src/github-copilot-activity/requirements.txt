@@ -1,7 +1,7 @@
 # Preview AgentServer features used by this sample.
 azure-ai-agentserver-activity==1.0.0b3
 azure-ai-agentserver-core==2.1.0b2
-azure-ai-agentserver-invocations==1.1.0b1
+azure-ai-agentserver-invocations==1.1.0
 
 # Microsoft 365 Agents SDK.
 microsoft-agents-hosting-core==1.4.0
